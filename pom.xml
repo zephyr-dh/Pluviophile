@@ -2,6 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.oacy</groupId>
   <artifactId>Pluviophile</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <packaging>war</packaging>
 </project>
