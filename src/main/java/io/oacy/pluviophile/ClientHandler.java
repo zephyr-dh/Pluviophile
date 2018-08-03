@@ -1,86 +1,41 @@
 package io.oacy.pluviophile;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 
 import io.oacy.pluviophile.http.HttpRequest;
+import io.oacy.pluviophile.http.HttpResponse;
 
 /**
  * 该线程任务供WebServer使用.负责处理指定客户端的交互.
+ * 
  * @author Zephyr
  *
  */
-public class ClientHandler implements Runnable{
+public class ClientHandler implements Runnable {
 	private Socket socket;
-	public ClientHandler(Socket socket){
+
+	public ClientHandler(Socket socket) {
 		this.socket = socket;
 	}
+
 	public void run() {
 		try {
-			//打桩
-			System.out.println("ClientHandler:开始处理请求");
-			
-			//解析请求信息
-			HttpRequest request 
-				= new HttpRequest(socket.getInputStream());
-			
-			//打桩
-			System.out.println("ClientHandler:url:"+request.getUrl());
-			
-			File file = new File("webapps"+request.getUrl());
-			System.out.println("文件路径:"+"webapps"+request.getUrl());
-			//打桩
-			System.out.println("文件是否存在:"+file.exists());
-			if(file.exists()){
-				//将该文件发送回给客户端
-				OutputStream out = socket.getOutputStream();
-				/*
-				 * 回复HTTP响应
-				 */
-				//1 发送状态行
-				String line = "HTTP/1.1 200 OK";
-				out.write(line.getBytes("ISO8859-1"));
-				out.write(13);//written CR
-				out.write(10);//written LF
-				//打桩
-				System.out.println("状态行发送完毕.");
-				
-				//2 发送响应头
-				line = "Content-Type:text/html";
-				out.write(line.getBytes("ISO8859-1"));
-				out.write(13);//written CR
-				out.write(10);//written LF
-				
-				line = "Content-Length:"+file.length();
-				out.write(line.getBytes("ISO8859-1"));
-				out.write(13);//written CR
-				out.write(10);//written LF
-				//单独发送CRLF表示响应头部分发送完毕
-				out.write(13);//written CR
-				out.write(10);//written LF
-				//打桩
-				System.out.println("响应头发送完毕.");
-				
-				//发送响应正文(实际请求的资源的所有数据)
-				FileInputStream fis = new FileInputStream(file);
-				BufferedInputStream bis = new BufferedInputStream(fis);
-				byte[] buf = new byte[1024*10];//10k
-				int len = -1;//每次实际读取到的字节量
-				while((len = bis.read(buf))!=-1){
-					out.write(buf, 0, len);
-				}
-				bis.close();
-				//打桩
-				System.out.println("正文响应完毕!");
+			// 解析请求信息
+			HttpRequest request = new HttpRequest(socket.getInputStream());
+			// 创建响应对象
+			HttpResponse response = new HttpResponse(socket.getOutputStream());
+
+			File file = new File("webapps" + request.getUrl());
+			if (file.exists()) {
+				response.setEntity(file);
+				response.flush();
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally{
+		} finally {
 			try {
 				socket.close();
 			} catch (IOException e) {

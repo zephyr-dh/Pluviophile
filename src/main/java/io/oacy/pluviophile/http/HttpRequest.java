@@ -9,6 +9,7 @@ import java.io.InputStream;
  * @author Zephyr
  *
  */
+
 public class HttpRequest {
 	/*
 	 * 用于读取客户端发送过来数据的输入流.该流应该是
