@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 
+import io.oacy.pluviophile.context.HttpContext;
+
 /**
  * 该类表示一个具体的Http响应信息 一个标准的Http响应应该包含三部分: 1:状态行 2:响应头 3:响应正文
  * 
@@ -56,11 +58,11 @@ public class HttpResponse {
 	private void sendHeaders() {
 		System.out.println("HttpResponse:发送响应头");
 		try {
-			String line = "Content-Type:text/html";
+			String line = HttpContext.HEADER_CONTENT_TYPE + ":text/html";
 			System.out.println("header:" + line);
 			println(line);
 
-			line = "Content-Length:" + entity.length();
+			line = HttpContext.HEADER_CONTENT_LENGTH + ":" + entity.length();
 			System.out.println("header:" + line);
 			println(line);
 
@@ -96,8 +98,9 @@ public class HttpResponse {
 	private void println(String line) {
 		try {
 			out.write(line.getBytes("ISO8859-1"));
-			out.write(13);// written CR
-			out.write(10);// written LF
+			out.write(HttpContext.CR);// written CR
+			out.write(HttpContext.LF);// written LF
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

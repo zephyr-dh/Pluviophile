@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.oacy.pluviophile.context.HttpContext;
+
 /**
  * 当前类的每个实例用于表示一个具体的客户端发送过来的HTTP 请求
  * 
@@ -116,7 +118,7 @@ public class HttpRequest {
 			while ((d = in.read()) != -1) {
 				c2 = (char) d;
 				// CR编码为13 LF编码为10
-				if (c1 == 13 && c2 == 10) {
+				if (c1 == HttpContext.CR && c2 == HttpContext.LF) {
 					break;
 				}
 				builder.append(c2);
