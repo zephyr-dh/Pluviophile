@@ -4,6 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import io.oacy.pluviophile.context.HttpContext;
 
@@ -22,6 +25,10 @@ public class HttpResponse {
 	 * 响应实体 实际给客户端发送的文件
 	 */
 	private File entity;
+	/*
+	 * 响应头信息
+	 */
+	private Map<String, String> headers = new HashMap<String, String>();
 
 	public HttpResponse(OutputStream out) {
 		this.out = out;
@@ -58,13 +65,11 @@ public class HttpResponse {
 	private void sendHeaders() {
 		System.out.println("HttpResponse:发送响应头");
 		try {
-			String line = HttpContext.HEADER_CONTENT_TYPE + ":text/html";
-			System.out.println("header:" + line);
-			println(line);
-
-			line = HttpContext.HEADER_CONTENT_LENGTH + ":" + entity.length();
-			System.out.println("header:" + line);
-			println(line);
+			for (Entry<String, String> e : headers.entrySet()) {
+				String line = e.getKey() + ":" + e.getValue();
+				System.out.println("header:" + line);
+				println(line);
+			}
 
 			// 单独发送CRLF
 			println("");
@@ -114,4 +119,21 @@ public class HttpResponse {
 		this.entity = entity;
 	}
 
+	/**
+	 * 设置头信息Content-Type的值
+	 * 
+	 * @param contentType
+	 */
+	public void setContentType(String contentType) {
+		this.headers.put(HttpContext.HEADER_CONTENT_TYPE, contentType);
+	}
+
+	/**
+	 * 设置头信息Content-Length的值
+	 * 
+	 * @param length
+	 */
+	public void setContentLength(long length) {
+		this.headers.put(HttpContext.HEADER_CONTENT_LENGTH, length + "");
+	}
 }

@@ -2,6 +2,10 @@ package io.oacy.pluviophile;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import io.oacy.pluviophile.context.ServerContext;
 
 /**
  * WebServer web服务端主类
@@ -16,11 +20,16 @@ public class WebServer {
 	 */
 	private ServerSocket server;
 	/**
+	 * 线程池,负责管理处理客户端请求的线程
+	 */
+	private ExecutorService threadPool;
+	/**
 	 * 构造方法,用来初始化服务端
 	 */
 	public WebServer(){
 		try {
-			server = new ServerSocket(8088);
+			server = new ServerSocket(ServerContext.port);
+			threadPool = Executors.newFixedThreadPool(ServerContext.threadPoolSum);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -30,12 +39,11 @@ public class WebServer {
 	 */
 	public void start(){
 		try {
-
+			while(true){
 				Socket socket = server.accept();
 				ClientHandler handler = new ClientHandler(socket);
-				Thread t = new Thread(handler);
-				t.start();
-
+				threadPool.execute(handler);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
